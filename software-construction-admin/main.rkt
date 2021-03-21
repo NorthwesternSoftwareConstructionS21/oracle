@@ -57,7 +57,10 @@
   (define test-exe-path
     (path->complete-path (assign-number->deliverable-exe-path assign-number)))
 
+  ;; these configuration options might be better saved in some kind
+  ;; of a datastructure or perhaps fetched from the oracle itself somehow
   (define oracle-needs-student-output? (and (member major-number '(5 9)) #t))
+  (define racket-based-oracle? (and (member major-number '(6 7 8)) #t))
   
   (unless (file-exists? test-exe-path)
     (raise-user-error 'software-construction-admin
@@ -73,8 +76,10 @@
        })
   (define failed-peer-tests
     (test-failures-for test-exe-path
-                       (assign-number->oracle-path assign-number)
+                       (assign-number->oracle-path assign-number
+                                                   #:racket-based-oracle? racket-based-oracle?)
                        validated-tests-by-team
+                       #:racket-based-oracle? racket-based-oracle?
                        #:oracle-needs-student-output? oracle-needs-student-output?))
   (log-fest-info @~a{Done running tests.})
 

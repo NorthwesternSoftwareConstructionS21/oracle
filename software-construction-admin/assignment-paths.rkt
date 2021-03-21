@@ -33,10 +33,11 @@
               "run"))
 
 
-(define/contract (assign-number->oracle-path assign-number)
-  (assign-number? . -> . (or/c path-to-existant-file? #f))
+(define/contract (assign-number->oracle-path assign-number #:racket-based-oracle? racket-based-oracle?)
+  (assign-number? #:racket-based-oracle? boolean? . -> . (or/c path-to-existant-file? #f))
 
   (define candidate
-    (build-path oracle-binary-dir (format "oracle~a.~a" (car assign-number) (cdr assign-number))))
+    (build-path oracle-binary-dir (format "oracle~a.~a~a" (car assign-number) (cdr assign-number)
+                                          (if racket-based-oracle? ".rkt" ""))))
   (and (file-exists? candidate)
        candidate))
