@@ -131,7 +131,18 @@
                            #:limit-stdout? #t
                            #:limit-stderr? #t))
 
-        (define (send-json out json) (write-json json out) (newline out) (flush-output out))
+        (define (send-json out json)
+          (with-handlers ([exn:fail? (λ (x)
+                                       (log-fest-error @~a{
+                            @(pretty-path exe-path) fails test @(if input-file (~a (basename input-file) " ") "")because the following JSON message could not be sent
+                            ------------------------------
+                            @(jsexpr->bytes json)
+                            ------------------------------
+                            })
+                                       (raise x))])
+            (write-json json out)
+            (newline out)
+            (flush-output out)))
         (define (recv-json in ctc)
           (define val (read-json/safe in))
           (unless ((flat-contract-predicate ctc) val)
